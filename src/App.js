@@ -1,28 +1,91 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import "./App.css";
+import ChildComp from "./components/childComponent";
+import { connect } from "react-redux";
+import { initializeState, setStep } from "./actions/actionStep";
 
 class App extends Component {
+  constructor(Props) {
+    super(Props);
+    this.state = {
+      step: this.props.step,
+    };
+    this.callReset = this.callReset.bind(this);
+    this.updateStep = this.updateStep.bind(this);
+  }
+
+  updateStep = async event => {
+    event.preventDefault();
+    if (this.props.step >= 2) {
+      this.props.setStep(0);
+    } else {
+      this.props.setStep(this.props.step + 1);
+    }
+  };
+
+  renderComponent() {
+    switch (this.props.step) {
+      case 0:
+        return (
+          <ChildComp
+            childName={"Child 1: "}
+            buttonName={"Click Meh"}
+            controlFunc={this.updateStep}
+          />
+        );
+      case 1:
+        return (
+          <ChildComp
+            childName={"Child 2: "}
+            buttonName={"Click Meh"}
+            controlFunc={this.updateStep}
+          />
+        );
+      case 2:
+        return (
+          <ChildComp
+            childName={"Child 3: "}
+            buttonName={"Click Meh"}
+            controlFunc={this.updateStep}
+          />
+        );
+      default:
+        return (
+          <ChildComp
+            childName={"Child 1: "}
+            buttonName={"Click Meh"}
+            controlFunc={this.updateStep}
+          />
+        );
+    }
+  }
+
+  callReset() {
+    this.props.initializeState();
+  }
+
   render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
+    console.log(this.props);
+    return <div className="App">Parent Component {this.renderComponent()}</div>;
   }
 }
 
-export default App;
+const mapStateToProps = state => {
+  return { step: state.step };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    initializeState: data => {
+      dispatch(initializeState(data));
+    },
+    setStep: data => {
+      dispatch(setStep(data));
+    }
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);
